@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pixel Thoughts - Meditation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            cursor: none;
+        }
+        
+        /* Custom Cursor */
+        .cursor {
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255,255,255,0.5);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            transition: transform 0.1s ease;
+        }
+        
+        .cursor.hover {
+            transform: scale(1.5);
+            border-color: #fff;
+        }
+        
+        /* Background Canvas */
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+        
+        /* Main Container */
+        .container {
+            text-align: center;
+            z-index: 1;
+            padding: 2rem;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 300;
+            letter-spacing: 8px;
+            text-transform: uppercase;
+            margin-bottom: 3rem;
+            opacity: 0.7;
+        }
+        
+        /* Meditation Circle */
+        .meditation-circle {
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 3rem;
+            position: relative;
+            animation: breathe 8s ease-in-out infinite;
+        }
+        
+        @keyframes breathe {
+            0%, 100% { 
+                transform: scale(1);
+                box-shadow: 0 0 50px rgba(255,255,255,0.1);
+            }
+            50% { 
+                transform: scale(1.2);
+                box-shadow: 0 0 100px rgba(255,255,255,0.2);
+            }
+        }
+        
+        .circle-inner {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Timer */
+        .timer {
+            font-size: 4rem;
+            font-weight: 300;
+            letter-spacing: 5px;
+        }
+        
+        .timer-label {
+            font-size: 0.9rem;
+            opacity: 0.5;
+            margin-top: 0.5rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+        
+        /* Controls */
+        .controls {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+        
+        .btn {
+            padding: 1rem 2rem;
+            border: 1px solid rgba(255,255,255,0.3);
+            background: transparent;
+            color: #fff;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.9rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 50px;
+        }
+        
+        .btn:hover {
+            background: rgba(255,255,255,0.1);
+            border-color: #fff;
+        }
+        
+        .btn.active {
+            background: rgba(255,255,255,0.2);
+            border-color: #fff;
+        }
+        
+        /* Instructions */
+        .instructions {
+            position: fixed;
+            bottom: 2rem;
+            font-size: 0.8rem;
+            opacity: 0.4;
+            letter-spacing: 2px;
+        }
+        
+        /* Breathing Guide */
+        .breath-guide {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.2rem;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            pointer-events: none;
+        }
+        
+        .breath-guide.show {
+            opacity: 0.6;
+        }
+        
+        /* Particles */
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: float 10s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0) scale(1); opacity: 0; }
+            10% { opacity: 0.8; }
+            90% { opacity: 0.8; }
+            100% { transform: translateY(-100vh) scale(0.5); opacity: 0; }
+        }
+        
+        @media (max-width: 768px) {
+            .cursor {
+                display: none;
+            }
+            
+            body {
+                cursor: auto;
+            }
+            
+            .meditation-circle {
+                width: 250px;
+                height: 250px;
+            }
+            
+            .circle-inner {
+                width: 120px;
+                height: 120px;
+            }
+            
+            .timer {
+                font-size: 3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="cursor"></div>
+    <canvas id="canvas"></canvas>
+    
+    <div class="container">
+        <div class="logo">Pixel Thoughts</div>
+        
+        <div class="meditation-circle">
+            <div class="circle-inner">
+                <div>
+                    <div class="timer" id="timer">60</div>
+                    <div class="timer-label">seconds</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <button class="btn" id="startBtn">Start</button>
+            <button class="btn" id="resetBtn">Reset</button>
+            <button class="btn" id="musicBtn">🎵 Music</button>
+        </div>
+    </div>
+    
+    <div class="breath-guide" id="breathGuide">Breathe In...</div>
+    <div class="instructions">Click start and follow the circle</div>
+    
+    <!-- Ambient Music - Using generated tone -->
+    <script>
+        // Audio Context for ambient sound
+        let audioContext;
+        let isPlaying = false;
+        let oscillator;
+        let gainNode;
+        
+        function initAudio() {
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            gainNode = audioContext.createGain();
+            gainNode.connect(audioContext.destination);
+            gainNode.gain.value = 0;
+        }
+        
+        function playAmbient() {
+            if (!audioContext) initAudio();
+            
+            // Create ambient drone
+            oscillator = audioContext.createOscillator();
+            oscillator.type = 'sine';
+            oscillator.frequency.setValueAtTime(110, audioContext.currentTime); // A2
+            
+            // Add subtle modulation
+            const lfo = audioContext.createOscillator();
+            lfo.type = 'sine';
+            lfo.frequency.setValueAtTime(0.1, audioContext.currentTime);
+            
+            const lfoGain = audioContext.createGain();
+            lfoGain.gain.setValueAtTime(20, audioContext.currentTime);
+            
+            lfo.connect(lfoGain);
+            lfoGain.connect(oscillator.frequency);
+            
+            oscillator.connect(gainNode);
+            oscillator.start();
+            lfo.start();
+            
+            // Fade in
+            gainNode.gain.linearRampToValueAtTime(0.15, audioContext.currentTime + 2);
+            isPlaying = true;
+        }
+        
+        function stopAmbient() {
+            if (oscillator && gainNode) {
+                gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + 1);
+                setTimeout(() => {
+                    oscillator.stop();
+                    isPlaying = false;
+                }, 1000);
+            }
+        }
+        
+        // Custom cursor
+        const cursor = document.querySelector('.cursor');
+        let mouseX = 0, mouseY = 0;
+        
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            cursor.style.left = mouseX + 'px';
+            cursor.style.top = mouseY + 'px';
+        });
+        
+        document.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('mouseenter', () => cursor.classList.add('hover'));
+            btn.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
+        });
+        
+        // Canvas animation
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+        
+        class Particle {
+            constructor() {
+                this.reset();
+            }
+            
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = canvas.height + 10;
+                this.size = Math.random() * 3 + 1;
+                this.speed = Math.random() * 1 + 0.5;
+                this.opacity = Math.random() * 0.5 + 0.2;
+                this.color = `rgba(255, 255, 255, ${this.opacity})`;
+            }
+            
+            update() {
+                this.y -= this.speed;
+                if (this.y < -10) this.reset();
+            }
+            
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+            }
+        }
+        
+        // Create particles
+        for (let i = 0; i < 100; i++) {
+            particles.push(new Particle());
+        }
+        
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            
+            requestAnimationFrame(animate);
+        }
+        
+        animate();
+        
+        // Timer logic
+        let timeLeft = 60;
+        let timerInterval;
+        let isRunning = false;
+        
+        const timerDisplay = document.getElementById('timer');
+        const startBtn = document.getElementById('startBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const musicBtn = document.getElementById('musicBtn');
+        const breathGuide = document.getElementById('breathGuide');
+        
+        function updateTimer() {
+            timerDisplay.textContent = timeLeft;
+            
+            // Update breath guide
+            const totalCycle = 8; // 4s in, 4s out
+            const currentTime = (60 - timeLeft) % totalCycle;
+            
+            if (currentTime < 4) {
+                breathGuide.textContent = 'Breathe In...';
+                breathGuide.classList.add('show');
+            } else {
+                breathGuide.textContent = 'Breathe Out...';
+                breathGuide.classList.add('show');
+            }
+            
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                isRunning = false;
+                startBtn.textContent = 'Start';
+                startBtn.classList.remove('active');
+                breathGuide.textContent = '✨ Complete ✨';
+                setTimeout(() => {
+                    breathGuide.classList.remove('show');
+                }, 3000);
+            }
+        }
+        
+        startBtn.addEventListener('click', () => {
+            if (isRunning) {
+                clearInterval(timerInterval);
+                isRunning = false;
+                startBtn.textContent = 'Start';
+                startBtn.classList.remove('active');
+                breathGuide.classList.remove('show');
+            } else {
+                if (timeLeft === 0) timeLeft = 60;
+                timerInterval = setInterval(() => {
+                    timeLeft--;
+                    updateTimer();
+                }, 1000);
+                isRunning = true;
+                startBtn.textContent = 'Pause';
+                startBtn.classList.add('active');
+            }
+        });
+        
+        resetBtn.addEventListener('click', () => {
+            clearInterval(timerInterval);
+            timeLeft = 60;
+            isRunning = false;
+            timerDisplay.textContent = '60';
+            startBtn.textContent = 'Start';
+            startBtn.classList.remove('active');
+            breathGuide.classList.remove('show');
+        });
+        
+        musicBtn.addEventListener('click', () => {
+            if (isPlaying) {
+                stopAmbient();
+                musicBtn.classList.remove('active');
+            } else {
+                playAmbient();
+                musicBtn.classList.add('active');
+            }
+        });
+        
+        // Hide default cursor on mobile
+        if (window.innerWidth <= 768) {
+            cursor.style.display = 'none';
+        }
+    </script>
+</body>
+</html>
