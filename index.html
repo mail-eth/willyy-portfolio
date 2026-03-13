@@ -237,9 +237,9 @@
         
         .hero-title {
             font-family: 'Space Grotesk', sans-serif;
-            font-size: clamp(3rem, 10vw, 7rem);
+            font-size: clamp(2rem, 8vw, 5rem);
             font-weight: 800;
-            line-height: 1;
+            line-height: 1.1;
             margin-bottom: 1.5rem;
             opacity: 0;
         }
@@ -616,15 +616,85 @@
         
         @media (max-width: 768px) {
             nav {
-                padding: 1rem 1.5rem;
+                padding: 1rem 1rem;
             }
             
             .nav-links {
                 display: none;
             }
             
+            .hero {
+                padding: 1.5rem;
+            }
+            
+            .hero-subtitle {
+                padding: 0 1rem;
+            }
+            
+            .hero-buttons {
+                flex-direction: column;
+                padding: 0 2rem;
+            }
+            
+            .btn {
+                width: 100%;
+                text-align: center;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1rem;
+            }
+            
+            .stat-item {
+                padding: 1.5rem 1rem;
+            }
+            
+            .stat-number {
+                font-size: 2rem;
+            }
+            
+            .projects {
+                padding: 4rem 1rem;
+            }
+            
             .projects-grid {
                 grid-template-columns: 1fr;
+            }
+            
+            .section-header {
+                padding: 0 1rem;
+            }
+            
+            .cta {
+                padding: 4rem 1rem;
+            }
+            
+            .cursor, .cursor-dot {
+                display: none;
+            }
+            
+            body {
+                cursor: auto;
+            }
+        }
+        
+        /* Small phones */
+        @media (max-width: 480px) {
+            .hero-title {
+                font-size: 2.5rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .section-title {
+                font-size: 1.8rem;
+            }
+            
+            .project-card {
+                border-radius: 16px;
             }
         }
     </style>
